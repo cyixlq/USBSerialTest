@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.lzy.usbserialtest.utils.USBSerialPortUtil
+import java.lang.StringBuilder
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,10 +25,29 @@ class MainActivity : AppCompatActivity() {
             @SuppressLint("SetTextI18n")
             override fun onDataReceive(data: ByteArray) {
                 val text = tvReceive.text.toString()
-                tvReceive.text = text + "\n" + data.contentToString()
+                tvReceive.text = text + "\n" + getByteArrayString(data)
             }
         }
         USBSerialPortUtil.setOnDataReceiveListener(listener)
+    }
+
+    private fun getByteArrayString(byteArray: ByteArray): String {
+        val stringBuilder = StringBuilder()
+        val max = byteArray.size
+        stringBuilder.append("[")
+        byteArray.forEachIndexed { index, byte ->
+            if (byte == 0.toByte()) {
+                if (index == max - 1)
+                    stringBuilder.append("]")
+                return@forEachIndexed
+            }
+            stringBuilder.append(Integer.toHexString(byte.toInt()))
+            if (index == max - 1)
+                stringBuilder.append("]")
+            else
+                stringBuilder.append(",")
+        }
+        return stringBuilder.toString()
     }
 
     private fun initView() {
@@ -60,10 +80,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val str = edtSendData.text.toString()
-        val data = ByteArray(str.length)
-        for (i in str.indices) {
-            val byte = str[i].toByte()
-            data[i] = byte
+        if (str.isBlank())
+            toastShort("请输入要发送的数据")
+        val strArray = str.split(" ")
+        val data = ByteArray(strArray.size)
+        strArray.forEachIndexed { index, s ->
+            val byte = s.toInt().toByte()
+            data[index] = byte
         }
         USBSerialPortUtil.send(data)
     }

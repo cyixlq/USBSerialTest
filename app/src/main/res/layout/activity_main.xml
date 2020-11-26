@@ -34,7 +34,7 @@
         app:layout_constraintTop_toBottomOf="@id/btnOpen"
         app:layout_constraintEnd_toStartOf="@id/btnSend"
         android:hint="需要发送的数据"
-        android:inputType="number"
+        android:inputType="text"
         tools:ignore="Autofill" />
     <Button
         android:id="@+id/btnSend"

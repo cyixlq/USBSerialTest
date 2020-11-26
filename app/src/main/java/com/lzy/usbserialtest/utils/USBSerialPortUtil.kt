@@ -103,8 +103,8 @@ object USBSerialPortUtil {
 
     class ReadThread : Thread() {
         override fun run() {
-            val buffer = ByteArray(12)
             while (isOpen.get()) {
+                val buffer = ByteArray(512)
                 val length = driver.ReadData(buffer, buffer.size)
                 if (length != 0) {
                     handler.post {
